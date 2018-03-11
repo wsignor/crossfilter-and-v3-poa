@@ -38,6 +38,7 @@ function init() {
     lngDimension = filter.dimension(function (p) {
         return p.LONGITUDE;
     });
+
     google.maps.event.addListener(map, 'bounds_changed', function () {
         var bounds = this.getBounds();
         var northEast = bounds.getNorthEast();
@@ -77,16 +78,67 @@ function initMap() {
     };
     map = new google.maps.Map(document.getElementById('map-div'), mapOptions);
 
+    var opt = {
+        "styles": [
+            {textColor: "black", textSize: 15, height: 60, width: 60},
+            {textColor: "black", textSize: 15, height: 70, width: 70},
+            {textColor: "black", textSize: 15, height: 80, width: 80},
+            {textColor: "black", textSize: 15, height: 90, width: 90},
+            {textColor: "black", textSize: 15, height: 100, width: 100}
+        ],
+
+        "legend": {
+            "Fatal": "#FF0066",
+            "Very serious injuries": "#FF9933",
+            "Serious injuries": "#FFFF00",
+            "Minor injuries": "#99FF99",
+            "No injuries": "#66CCFF",
+            "Not recorded": "#A5A5A5"
+        }
+    };
+
     // create array of markers from points and add them to the map
     for (var i = 0; i < acidentes.length; i++) {
         var point = acidentes[i];
+        var accident_injuries = acidentes[i].FERIDOS;
+        var accident_title = "";
+        //var accident_lnglat = acidentes[i].geometry["coordinates"];
+        switch (Number(accident_injuries)) {
+            case 1:
+                accident_title = "Fatal";
+                break;
+            case 3:
+                accident_title = "Serious injuries";
+                break;
+            case 2:
+                accident_title = "Very serious injuries";
+                break;
+            case 5:
+                accident_title = "No injuries";
+                break;
+            case 4:
+                accident_title = "Minor injuries";
+                break;
+            case 6:
+                accident_title = "Not recorded";
+                break;
+        }
         markers[i] = new google.maps.Marker({
             //position: new google.maps.LatLng(point.lat, point.lng),
             position: new google.maps.LatLng(point.LATITUDE, point.LONGITUDE),
             map: map,
-            title: 'marker ' + i
+            title: accident_title
         });
     }
+
+    console.log("map: " , map);
+    console.log("markers: " , markers);
+    console.log("opt: " , opt);
+
+    var markerCluster = new MarkerClusterer(map, markers, opt);
+
+    //google.load("visualization", "1", {packages: ["corechart"]});
+    //google.setOnLoadCallback(init);
 }
 
 function initCrossfilter() {
