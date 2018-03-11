@@ -18,18 +18,25 @@ var lngDimension;
 var idDimension;
 var idGrouping;
 
+var acidentes = [];
+
+function init1() {
+    d3.csv("acidentes-2016-less.csv", function (d) {
+        acidentes = d;
+        init();
+    });
+}
+
 function init() {
     initMap();
     initCrossfilter();
 
     // bind map bounds to lat/lng filter dimensions
     latDimension = filter.dimension(function (p) {
-        console.log("p lat: " , p);
-        return p.lat;
+        return p.LATITUDE;
     });
     lngDimension = filter.dimension(function (p) {
-        console.log("p lng: " , p);
-        return p.lng;
+        return p.LONGITUDE;
     });
     google.maps.event.addListener(map, 'bounds_changed', function () {
         var bounds = this.getBounds();
@@ -71,10 +78,11 @@ function initMap() {
     map = new google.maps.Map(document.getElementById('map-div'), mapOptions);
 
     // create array of markers from points and add them to the map
-    for (var i = 0; i < points.length; i++) {
-        var point = points[i];
+    for (var i = 0; i < acidentes.length; i++) {
+        var point = acidentes[i];
         markers[i] = new google.maps.Marker({
-            position: new google.maps.LatLng(point.lat, point.lng),
+            //position: new google.maps.LatLng(point.lat, point.lng),
+            position: new google.maps.LatLng(point.LATITUDE, point.LONGITUDE),
             map: map,
             title: 'marker ' + i
         });
@@ -82,12 +90,13 @@ function initMap() {
 }
 
 function initCrossfilter() {
-    filter = crossfilter(points);
+    filter = crossfilter(acidentes);
 
     // simple dimensions and groupings for major variables
     val1Dimension = filter.dimension(
         function (p) {
-            return p.val1;
+            //return p.val1;
+            return p.FERIDOS;
         });
     val1Grouping = val1Dimension.group(
         function (v) {
@@ -96,7 +105,8 @@ function initCrossfilter() {
 
     val2Dimension = filter.dimension(
         function (p) {
-            return p.val2;
+            //return p.val2;
+            return p.MORTES;
         });
     val2Grouping = val2Dimension.group(
         function (v) {

@@ -23,7 +23,10 @@ function barChart() {
         var width = x.range()[1];
         var height = y.range()[0];
 
-        y.domain([0, group.top(1)[0].value]);
+        if(typeof group.top(1)[0] != 'undefined') {
+            //console.log("group.top(1)[0].value: " , group.top(1)[0].value);
+            y.domain([0, group.top(1)[0].value]);
+        }
 
         div.each(function () {
             var div = d3.select(this);
